@@ -1,0 +1,37 @@
+# Ignora pastas do Visual Studio
+.vs/
+*.user
+*.suo
+*.cache
+*.db
+*.VC.db
+*.vscode/
+
+# Ignora pastas de build
+bin/
+obj/
+out/
+TestResults/
+
+# Ignora arquivos temporários
+*.log
+*.tmp
+*.bak
+*.swp
+*.DS_Store
+Thumbs.db
+
+# Ignora arquivos gerados pelo build
+*.dll
+*.exe
+*.pdb
+*.mdb
+
+# Ignora arquivos de publish
+*.publishsettings
+app.publish/
+
+# Ignora pacotes
+*.nupkg
+*.snupkg
+packages/
