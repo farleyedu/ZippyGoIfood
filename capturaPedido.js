@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
     const pedido = {
         id: null,
         peidoIdIfood: null,
@@ -11,9 +11,11 @@
         coordenadas: null,
         cliente: {},
         endereco: {},
-        itens: []
+        itens: [],
+        pagamento: null
     };
 
+    // ID do pedido + nome do cliente
     const titulo = document.querySelector('h2.BaseHeading-sc-x85g2i-0');
     if (titulo) {
         const texto = titulo.innerText.trim();
@@ -23,38 +25,81 @@
         pedido.cliente.nome = partes.slice(1).join(' ');
     }
 
-    const feitoMatch = document.body.innerText.match(/Feito �s (\d{2}:\d{2})/);
+    // Horário de criação do pedido (convertido para UTC)
+    const feitoMatch = document.body.innerText.match(/Feito às (\d{2}):(\d{2})/);
     if (feitoMatch) {
-        const [hora, minuto] = feitoMatch[1].split(':');
-        const agora = new Date();
-        agora.setHours(parseInt(hora), parseInt(minuto), 0, 0);
-        pedido.criadoEm = agora.toISOString();
+        const local = new Date();
+        local.setHours(parseInt(feitoMatch[1]), parseInt(feitoMatch[2]), 0, 0);
+        pedido.criadoEm = new Date(local.getTime() - 3 * 60 * 60 * 1000).toISOString();
     }
 
+    // Telefone via regex
+    const telMatch = document.body.innerText.match(/(\d{4} \d{3} \d{4})/);
+    if (telMatch) {
+        pedido.cliente.telefone = telMatch[1];
+    }
+
+    // Previsão de entrega (convertido para UTC)
     const entrega = document.querySelector('b.sc-fGdiLE');
     if (entrega) {
         const [h, m] = entrega.innerText.trim().split(':');
-        const dt = new Date();
-        dt.setHours(parseInt(h), parseInt(m), 0, 0);
-        pedido.previsaoEntrega = dt.toISOString();
-        pedido.horarioEntrega = dt.toISOString();
+        const local = new Date();
+        local.setHours(parseInt(h), parseInt(m), 0, 0);
+        const utc = new Date(local.getTime() - 3 * 60 * 60 * 1000);
+        pedido.previsaoEntrega = utc.toISOString();
+        pedido.horarioEntrega = utc.toISOString();
     }
 
-    const enderecoSpan = Array.from(document.querySelectorAll('span'))
-        .find(el => el.innerText.includes('Gran Ville'));
-    if (enderecoSpan) {
-        pedido.endereco = {
-            rua: enderecoSpan.innerText.trim(),
-            bairro: '',
-            numero: '',
-            cidade: 'Uberl�ndia',
-            complemento: ''
-        };
+    // Endereço
+    const inlineItems = document.querySelectorAll('.DetailsDeliverySectionItem .InlineList .InlineItem');
+    if (inlineItems.length >= 2) {
+        // Endereço principal
+        let textoEndereco = '';
+        inlineItems[0].childNodes.forEach(node => {
+            if (node.nodeType === Node.TEXT_NODE) {
+                textoEndereco += node.textContent;
+            }
+        });
+        textoEndereco = textoEndereco.trim();
+
+        const partes = textoEndereco.split(' - ');
+        if (partes.length === 3) {
+            const [ruaNumero, bairro, cidade] = partes;
+            const match = ruaNumero.match(/^(.*?),\s*(\d+)$/);
+            if (match) {
+                pedido.endereco.rua = match[1];
+                pedido.endereco.numero = match[2];
+                pedido.endereco.bairro = bairro.trim();
+                pedido.endereco.cidade = cidade.trim();
+            }
+        }
+
+        // CEP
+        const cepSpan = inlineItems[1].querySelector('span');
+        if (cepSpan) {
+            pedido.endereco.cep = cepSpan.innerText.trim();
+        }
+
+        // Complemento
+        const complementoItem = document.querySelectorAll('.DetailsDeliverySectionItem .InlineList')[1]?.querySelector('.InlineItem');
+        if (complementoItem) {
+            let textoComp = '';
+            complementoItem.childNodes.forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    textoComp += node.textContent;
+                }
+            });
+            pedido.endereco.complemento = textoComp.trim();
+        }
     }
 
+    // Código de retirada
     const cod = document.querySelector('[data-test-id="localizer-id"] b');
-    if (cod) pedido.codigoRetirada = cod.innerText.trim();
+    if (cod) {
+        pedido.codigoRetirada = cod.innerText.trim();
+    }
 
+    // Itens do pedido
     const itens = [];
     const itensList = document.querySelectorAll('li.sc-biptUy');
     itensList.forEach(li => {
@@ -70,5 +115,16 @@
     });
     pedido.itens = itens;
 
+    // Tipo de pagamento
+    const pagamentoSection = document.querySelector('.Summary__item--expandable .InlineList');
+    if (pagamentoSection) {
+        const pagamentoText = Array.from(pagamentoSection.querySelectorAll('.InlineItem'))
+            .map(el => el.childNodes[0]?.textContent.trim())
+            .filter(Boolean)
+            .join(' - ');
+        pedido.pagamento = pagamentoText;
+    }
+
+    // Envia o pedido
     window.chrome.webview.postMessage(pedido);
 })();

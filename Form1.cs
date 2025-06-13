@@ -29,12 +29,12 @@ namespace ZippyGoIfood
             var confirm = MessageBox.Show("Deseja enviar esse pedido para a API?", "Confirmação", MessageBoxButtons.YesNo);
             if (confirm == DialogResult.Yes)
             {
-                await EnviarPedidoParaApiAsync(json);
+                //await EnviarPedidoParaApiAsync(json);
             }
         }
 
         private async void btnCapturar_Click(object sender, EventArgs e)
-        {
+         {
             string script = System.IO.File.ReadAllText(@"D:\TI\Aplicativos\back end\ZippyGoIfood\capturaPedido.js");
             var DadosPedido = await webView21.CoreWebView2.ExecuteScriptAsync(script);
         }
@@ -42,7 +42,8 @@ namespace ZippyGoIfood
         private async Task EnviarPedidoParaApiAsync(string json)
         {
             using var client = new HttpClient();
-//            string json1 = @"{
+
+//string json1 = @"{
 //  ""id"": null,
 //  ""peidoIdIfood"": ""8387"",
 //  ""displayId"": ""8387"",
