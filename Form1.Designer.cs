@@ -25,9 +25,9 @@
             webView21.CreationProperties = null;
             webView21.DefaultBackgroundColor = Color.White;
             webView21.Dock = DockStyle.Fill;
-            webView21.Location = new Point(0, 49);
+            webView21.Location = new Point(0, 36);
             webView21.Name = "webView21";
-            webView21.Size = new Size(1000, 691);
+            webView21.Size = new Size(1000, 704);
             webView21.TabIndex = 0;
             webView21.ZoomFactor = 1D;
             // 
@@ -36,7 +36,7 @@
             btnCapturar.Dock = DockStyle.Top;
             btnCapturar.Location = new Point(0, 0);
             btnCapturar.Name = "btnCapturar";
-            btnCapturar.Size = new Size(1000, 49);
+            btnCapturar.Size = new Size(1000, 36);
             btnCapturar.TabIndex = 1;
             btnCapturar.Text = "Capturar Pedido";
             btnCapturar.Click += btnCapturar_Click;

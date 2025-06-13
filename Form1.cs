@@ -19,7 +19,7 @@ namespace ZippyGoIfood
 
             webView21.CoreWebView2.WebMessageReceived += WebView_WebMessageReceived;
 
-            webView21.CoreWebView2.Navigate("https://gestordepedidos.ifood.com.br/#/home/orders");
+            webView21.CoreWebView2.Navigate("https://gestordepedidos.ifood.com.br/#/home/orders/now");
         }
 
         private async void WebView_WebMessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs e)
