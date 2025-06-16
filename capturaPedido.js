@@ -1,18 +1,18 @@
 ﻿(function () {
     const pedido = {
         id: null,
-        peidoIdIfood: null,
+        pedidoIdIfood: null,
         displayId: null,
         criadoEm: null,
         previsaoEntrega: null,
         horarioEntrega: null,
         horarioSaida: null,
-        codigoRetirada: null,
+        localizador: null,
         coordenadas: null,
         cliente: {},
         endereco: {},
         itens: [],
-        pagamento: null
+        tipoPagamento: null
     };
 
     // ID do pedido + nome do cliente
@@ -21,7 +21,7 @@
         const texto = titulo.innerText.trim();
         const partes = texto.split(' ');
         pedido.displayId = partes[0];
-        pedido.peidoIdIfood = partes[0].replace('#', '');
+        pedido.pedidoIdIfood = partes[0].replace('#', '');
         pedido.cliente.nome = partes.slice(1).join(' ');
     }
 
@@ -96,7 +96,7 @@
     // Código de retirada
     const cod = document.querySelector('[data-test-id="localizer-id"] b');
     if (cod) {
-        pedido.codigoRetirada = cod.innerText.trim();
+        pedido.localizador = cod.innerText.trim();
     }
 
     // Itens do pedido
@@ -122,7 +122,7 @@
             .map(el => el.childNodes[0]?.textContent.trim())
             .filter(Boolean)
             .join(' - ');
-        pedido.pagamento = pagamentoText;
+        pedido.tipoPagamento = pagamentoText;
     }
 
     // Envia o pedido

@@ -7,11 +7,12 @@ namespace ZippyGoIfood
 {
     public partial class Form1 : Form
     {
-        public Form1()
+        readonly EnderecoService enderecoService;
+        public Form1(EnderecoService enderecoService)
         {
+            this.enderecoService = enderecoService ?? throw new ArgumentNullException(nameof(enderecoService));
             InitializeComponent();
         }
-
         private async void Form1_Load(object sender, EventArgs e)
         {
             var env = await CoreWebView2Environment.CreateAsync(null, "UserData", null);
@@ -29,9 +30,11 @@ namespace ZippyGoIfood
             var confirm = MessageBox.Show("Deseja enviar esse pedido para a API?", "Confirmação", MessageBoxButtons.YesNo);
             if (confirm == DialogResult.Yes)
             {
-                //await EnviarPedidoParaApiAsync(json);
+                var updatejsonCord = await enderecoService.BuscarCoordenadasAsync(json);
+                await EnviarPedidoParaApiAsync(updatejsonCord);
             }
         }
+
 
         private async void btnCapturar_Click(object sender, EventArgs e)
          {
@@ -42,44 +45,6 @@ namespace ZippyGoIfood
         private async Task EnviarPedidoParaApiAsync(string json)
         {
             using var client = new HttpClient();
-
-//string json1 = @"{
-//  ""id"": null,
-//  ""peidoIdIfood"": ""8387"",
-//  ""displayId"": ""8387"",
-//  ""criadoEm"": null,
-//  ""previsaoEntrega"": ""2025-06-12T00:41:00.000Z"",
-//  ""horarioEntrega"": ""2025-06-12T00:41:00.000Z"",
-//  ""horarioSaida"": null,
-//  ""codigoRetirada"": ""9541 5464"",
-//  ""coordenadas"": {
-//    ""latitude"": 1,
-//    ""longitude"": 2
-//  },
-//  ""cliente"": {
-//    ""nome"": ""Farley Eduardo"",
-//    ""telefone"": """",
-//    ""documento"": """",
-//    ""localizador"": """"
-//  },
-//  ""endereco"": {
-//    ""rua"": ""Alameda dos Mandarins, 500 - Gran Ville - Uberlândia●00000000\nBloco 05 AP 08"",
-//    ""numero"": """",
-//    ""bairro"": """",
-//    ""cidade"": ""Uberlândia"",
-//    ""estado"": """",
-//    ""cep"": """",
-//    ""complemento"": """"
-//  },
-//  ""itens"": [
-//    {
-//      ""nome"": ""Molho de alho"",
-//      ""quantidade"": 1,
-//      ""precoUnitario"": 0.1,
-//      ""precoTotal"": 0.1
-//    }
-//  ]
-//}";
 
             var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
 
